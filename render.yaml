@@ -5,8 +5,8 @@ services:
     plan: free
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    # Run Celery in background (--detach) then start Gunicorn
-    startCommand: celery -A config worker -l info --detach && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    # Run migrations, start Celery in background, then start Gunicorn
+    startCommand: python manage.py migrate && celery -A config worker -l info --detach && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
