@@ -2,6 +2,7 @@ services:
   # Web Service (Django + Celery for Free Tier)
   - type: web
     name: project-nexus
+    plan: free
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     # Run Celery in background (--detach) then start Gunicorn
@@ -28,14 +29,15 @@ services:
           name: project-nexus-redis
           property: connectionString
 
+  # Redis Instance
+  - type: redis
+    name: project-nexus-redis
+    plan: free
+    ipAllowList: [] # Allow internal connections only
+
 databases:
   # Postgres Database
   - name: project-nexus-db
     databaseName: project_nexus
     user: project_nexus_user
     plan: free
-
-  # Redis Instance
-  - name: project-nexus-redis
-    plan: free
-    ipAllowList: [] # Allow internal connections only
