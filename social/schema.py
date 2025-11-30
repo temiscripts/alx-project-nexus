@@ -41,7 +41,7 @@ class Query(graphene.ObjectType):
     all_posts = DjangoFilterConnectionField(PostType)
 
     def resolve_all_posts(self, info, **kwargs):
-        # Optimization: Select related author and prefetch interactions
+
         return Post.objects.select_related('author').prefetch_related('comments', 'likes').order_by('-created_at')
 
 class CreatePost(graphene.Mutation):
@@ -56,7 +56,7 @@ class CreatePost(graphene.Mutation):
         if user.is_anonymous:
             raise Exception("Authentication required")
         
-        # Rate Limiting: Max 5 posts per minute
+
         from django.utils import timezone
         from datetime import timedelta
         one_minute_ago = timezone.now() - timedelta(minutes=1)
@@ -81,7 +81,7 @@ class CreateComment(graphene.Mutation):
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        # Decode Global ID if using Relay
+
         from graphql_relay import from_global_id
         _, p_id = from_global_id(post_id)
 
@@ -93,7 +93,7 @@ class CreateComment(graphene.Mutation):
         comment = Comment(user=user, post=post, text=text)
         comment.save()
         
-        # Trigger background task
+
         from .tasks import send_comment_notification
         if post.author.email:
              send_comment_notification.delay(post.author.email, post.id, text)
