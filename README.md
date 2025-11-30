@@ -24,7 +24,7 @@ A scalable, high-performance backend for a social media feed, built with Django,
 
 ## Database Schema
 
-You can view the Entity Relationship Diagram (ERD) in [ERD.md](ERD.md).
+You can view the Entity Relationship Diagram (ERD) [here](https://docs.google.com/document/d/1R8v8ecJiHPWIc_g-bOij_bwMgq9irYjvlfv53V8V-tg/edit?usp=sharing).
 
 ## Getting Started
 
