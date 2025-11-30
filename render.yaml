@@ -1,10 +1,11 @@
 services:
-  # Web Service (Django)
+  # Web Service (Django + Celery for Free Tier)
   - type: web
     name: project-nexus
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    # Run Celery in background (--detach) then start Gunicorn
+    startCommand: celery -A config worker -l info --detach && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -12,30 +13,6 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
-      - key: DATABASE_URL
-        fromDatabase:
-          name: project-nexus-db
-          property: connectionString
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: redis
-          name: project-nexus-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          type: redis
-          name: project-nexus-redis
-          property: connectionString
-
-  # Worker Service (Celery)
-  - type: worker
-    name: project-nexus-worker
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A config worker -l info
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
       - key: DATABASE_URL
         fromDatabase:
           name: project-nexus-db
